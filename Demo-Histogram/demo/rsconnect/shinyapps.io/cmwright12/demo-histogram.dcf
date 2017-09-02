@@ -1,0 +1,12 @@
+name: demo-histogram
+title: demo-histogram
+username:
+account: cmwright12
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 210177
+bundleId: 964654
+url: https://cmwright12.shinyapps.io/demo-histogram/
+when: 1504360395.53832
+asMultiple: FALSE
+asStatic: FALSE

@@ -1,0 +1,12 @@
+name: demo-diamonds
+title: demo-diamonds
+username:
+account: cmwright12
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 210182
+bundleId: 964677
+url: https://cmwright12.shinyapps.io/demo-diamonds/
+when: 1504363055.03911
+asMultiple: FALSE
+asStatic: FALSE
