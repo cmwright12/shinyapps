@@ -16,6 +16,7 @@ dashboardPage(
     tags$hr()
   ),
   dashboardBody(
+    h1(textOutput("courseID")),
     uiOutput("tb")
   )
 )

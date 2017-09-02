@@ -13,8 +13,11 @@ server <- function(input, output) {
     read.csv(file=file1$datapath, sep=",", header=T, stringsAsFactors=F)
   })
   
-  courseID <- reactive({ data$SIS.Course.ID[1] })
-  #selected <- reactive({ select(data, Student.Name, Class.Date, Attendance) })
+  output$courseID <- reactive({ 
+    if(is.null(data())){return("")}
+    data()$SIS.Course.ID[1] 
+    })
+
   
   # This reactive output contains the dataset and display the dataset in table format
   output$rawtable <- renderTable({
