@@ -1,9 +1,10 @@
 library(shiny)
 library(shinydashboard)
 library(dplyr)
+library(stringr)
 
 dashboardPage(
-  dashboardHeader(title= "Canvas Attendance Report"),
+  dashboardHeader(title= "Canvas Attendance Report - Menu Branch"),
   dashboardSidebar(
     
     # Input: Select a file ----
@@ -13,10 +14,35 @@ dashboardPage(
                          ".csv")),
     
     # Horizontal line ----
-    tags$hr()
+
+    tags$hr(),
+    
+    # Menu ----
+    sidebarMenu(
+      menuItem(h3("Dashboard"), tabName="dashboard"),
+      menuItem(h3("By Date"), tabName = "menu_date")
+      #menuItem(h3("By Student"), tabName = "menu_student")
+      #menuItem(h3("Attendance Report"), tabName = "menu_report")
+    )
   ),
   dashboardBody(
-    h1(textOutput("courseID")),
-    uiOutput("tb")
+    
+    tabItems(
+      # First tab content
+      tabItem(tabName = "dashboard",
+              h1(textOutput("courseID")),
+              uiOutput("tb")
+      ),
+      
+      # Second tab content
+      tabItem(tabName = "menu_date",
+              uiOutput("choose_day"),
+              uiOutput("choose_status"),
+              textOutput(length("by_day")),
+              uiOutput("by_day")
+              
+      )
+      
+    )
   )
 )
