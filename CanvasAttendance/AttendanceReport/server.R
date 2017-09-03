@@ -139,7 +139,8 @@ server <- function(input, output) {
   output$report_params <- renderUI({
     tagList(
       numericInput("pct", "Percent Threshold:", 100, min = 0, max = 100),
-      numericInput("mindays", "Min. number of days: ", 1, min = 0)      
+      h3("OR"),
+      numericInput("maxdays", "Max. number of days attended: ", 1, min = 0)      
     )
 
   })
@@ -159,7 +160,7 @@ server <- function(input, output) {
       ) %>%
       dplyr::mutate(Attend.Pct = 100 * sumP / (sumP + sumA)) %>%
       dplyr::mutate(Attend.Rate = paste(sumP,"/",sumP+sumA) ) %>%
-      filter(Attend.Pct <= input$pct | as.integer(substr(Attend.Rate, nchar(Attend.Rate), nchar(Attend.Rate))) <= input$mindays) %>%
+      filter(Attend.Pct <= input$pct | as.integer(substr(Attend.Rate, nchar(Attend.Rate), nchar(Attend.Rate))) <= input$maxdays) %>%
       select(Student.Name, Attend.Pct, Attend.Rate)
       
   })

@@ -5,8 +5,8 @@ account: cmwright12
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 210299
-bundleId: 965152
+bundleId: 965432
 url: https://cmwright12.shinyapps.io/canvasattendancereport/
-when: 1504417192.1121
+when: 1504447921.13408
 asMultiple: FALSE
 asStatic: FALSE
