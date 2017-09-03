@@ -1,3 +1,5 @@
+### Developer: Carmen Wright ###
+
 library(shiny)
 library(shinydashboard)
 library(dplyr)
@@ -21,19 +23,30 @@ dashboardPage(
     # Menu ----
     sidebarMenu(
       menuItem(h3("Dashboard"), tabName="dashboard"),
+      menuItem(h3("Select Students"), tabName="selecting"),
       menuItem(h3("By Date"), tabName = "menu_date"),
       menuItem(h3("By Student"), tabName = "menu_student"),
       menuItem(h3("Attendance Report"), tabName = "report")
-    )
+    ),
+    
+    tags$hr(),
+    h5("App Developer: Carmen Wright")
   ),
   dashboardBody(
     
     tabItems(
+      
       # First tab content
       tabItem(tabName = "dashboard",
               h1(textOutput("courseID")),
               uiOutput("tb")
       ),
+      
+      tabItem(tabName = "selecting",
+              h1("Selected"),
+              uiOutput("choose_students")
+      ),
+      
       
       # Second tab content
       tabItem(tabName = "menu_date",
