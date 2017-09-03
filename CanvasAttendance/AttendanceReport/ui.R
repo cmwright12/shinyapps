@@ -17,12 +17,13 @@ dashboardPage(
 
     tags$hr(),
     
+    
     # Menu ----
     sidebarMenu(
       menuItem(h3("Dashboard"), tabName="dashboard"),
       menuItem(h3("By Date"), tabName = "menu_date"),
-      menuItem(h3("By Student"), tabName = "menu_student")
-      #menuItem(h3("Attendance Report"), tabName = "menu_report")
+      menuItem(h3("By Student"), tabName = "menu_student"),
+      menuItem(h3("Attendance Report"), tabName = "report")
     )
   ),
   dashboardBody(
@@ -47,6 +48,12 @@ dashboardPage(
               uiOutput("choose_student"),
               uiOutput("by_student_rate"),
               uiOutput("by_student")
+      ),
+      
+      # Fourth tab content
+      tabItem(tabName = "report",
+              uiOutput("report_params"),
+              uiOutput("attendreport")
       )
       
     )

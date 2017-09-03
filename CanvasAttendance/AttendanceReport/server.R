@@ -10,7 +10,10 @@ server <- function(input, output) {
   data <- reactive({
     file1 <- input$file
     if(is.null(file1)){return()} 
-    read.csv(file=file1$datapath, sep=",", header=T, stringsAsFactors=F) 
+    read.csv(file=file1$datapath, sep=",", header=T, stringsAsFactors=F)  %>%
+    dplyr::mutate(Last.Name = str_extract(Student.Name, "[A-Za-z'-]+$")) %>%
+    dplyr::mutate(First.Name = str_extract(Student.Name, "^[A-Za-z'-]+")) %>%
+    arrange(Class.Date, Last.Name, First.Name)
   })
 
   #order_by_lastname <- function(data){
@@ -53,14 +56,10 @@ server <- function(input, output) {
   
   output$choose_student <- renderUI({
     studentnames <- data() %>%
-      dplyr::mutate(Last.Name = str_extract(Student.Name, "[A-Za-z'-]+$")) %>%
-      dplyr::mutate(First.Name = str_extract(Student.Name, "^[A-Za-z'-]+")) %>%
-      #dplyr::mutate(Name = paste(Last.Name, ", ", First.Name, sep="")) %>%
-      arrange(Last.Name, First.Name) %>%
       distinct(Student.Name)
-    #selectInput("student", "Select a student", as.list(unique(data()$Student.Name)))
     selectInput("student", "Select a student", as.list(studentnames))
   })
+  
   
   output$statuses <- reactive({
     if(is.null(data())){return("")}
@@ -70,16 +69,16 @@ server <- function(input, output) {
   output$students <- renderTable({
     if(is.null(data())){return("")}
     data() %>%
-      dplyr::mutate(Last.Name = str_extract(Student.Name, "[A-Za-z'-]+$")) %>%
-      dplyr::mutate(First.Name = str_extract(Student.Name, "^[A-Za-z'-]+")) %>%
-      arrange(Last.Name, First.Name) %>%
+      #dplyr::mutate(Last.Name = str_extract(Student.Name, "[A-Za-z'-]+$")) %>%
+      #dplyr::mutate(First.Name = str_extract(Student.Name, "^[A-Za-z'-]+")) %>%
+      #arrange(Last.Name, First.Name) %>%
       distinct(Student.Name)
   })
   output$nstudents <- reactive({
     data() %>%
-      dplyr::mutate(Last.Name = str_extract(Student.Name, "[A-Za-z'-]+$")) %>%
-      dplyr::mutate(First.Name = str_extract(Student.Name, "^[A-Za-z'-]+")) %>%
-      arrange(Last.Name, First.Name) %>%
+      #dplyr::mutate(Last.Name = str_extract(Student.Name, "[A-Za-z'-]+$")) %>%
+      #dplyr::mutate(First.Name = str_extract(Student.Name, "^[A-Za-z'-]+")) %>%
+      #arrange(Last.Name, First.Name) %>%
       distinct(Student.Name) %>%
       nrow()
   })
@@ -94,19 +93,17 @@ server <- function(input, output) {
   output$table <- renderTable({
     if(is.null(data())){return ()}
     data() %>%
-      dplyr::mutate(Last.Name = str_extract(Student.Name, "[A-Za-z'-]+$")) %>%
-      dplyr::mutate(First.Name = str_extract(Student.Name, "^[A-Za-z'-]+")) %>%
-      arrange(Class.Date, Last.Name, First.Name) %>%
+      #arrange(Class.Date, Last.Name, First.Name) %>%
       select(Student.Name, Class.Date, Attendance)
   })
+  
   
   output$by_day <- renderTable({
     if(is.null(data())){return ()}
     data() %>%
       filter(Class.Date == input$day, Attendance %in% input$status) %>%
-      dplyr::mutate(Last.Name = str_extract(Student.Name, "[A-Za-z'-]+$")) %>%
-      dplyr::mutate(First.Name = str_extract(Student.Name, "^[A-Za-z'-]+")) %>%
-      arrange(Last.Name, First.Name) %>%
+
+      #arrange(Last.Name, First.Name) %>%
       select(Student.Name, Attendance)
   })
   
@@ -139,6 +136,34 @@ server <- function(input, output) {
       select(Attend.Pct, Attend.Rate)
   })
   
+  output$report_params <- renderUI({
+    tagList(
+      numericInput("pct", "Percent Threshold:", 100, min = 0, max = 100),
+      numericInput("mindays", "Min. number of days: ", 1, min = 0)      
+    )
+
+  })
+  
+  output$attendreport <- renderTable({
+    if(is.null(data())){return ()}
+    data() %>% 
+      #dplyr::mutate(Last.Name = str_extract(Student.Name, "[A-Za-z'-]+$")) %>%
+      #dplyr::mutate(First.Name = str_extract(Student.Name, "^[A-Za-z'-]+")) %>%
+      group_by(Last.Name, First.Name, Student.Name) %>%
+      mutate(Status.Present = ifelse(Attendance=="present",1,0)) %>%
+      mutate(Status.Absent = ifelse(Attendance=="absent",1,0)) %>%
+      mutate(Status.Unmarked = ifelse(Attendance=="unmarked",1,0)) %>%
+      summarize(sumP = sum(Status.Present),
+                sumA = sum(Status.Absent),
+                sumU = sum(Status.Unmarked)
+      ) %>%
+      dplyr::mutate(Attend.Pct = 100 * sumP / (sumP + sumA)) %>%
+      dplyr::mutate(Attend.Rate = paste(sumP,"/",sumP+sumA) ) %>%
+      filter(Attend.Pct <= input$pct | as.integer(substr(Attend.Rate, nchar(Attend.Rate), nchar(Attend.Rate))) <= input$mindays) %>%
+      select(Student.Name, Attend.Pct, Attend.Rate)
+      
+  })
+  
   # the following renderUI is used to dynamically generate the tabsets when the file is loaded. Until the file is loaded, app will not show the tabset.
   output$tb <- renderUI({
     if(is.null(data()))
@@ -153,6 +178,11 @@ server <- function(input, output) {
                  h5("Dates of Report"), textOutput("days"),
                  h5("No. of students: "), textOutput("nstudents"),
                  tableOutput("students"))
+        #tabPanel("Select Students"),
+        #  h5("Selected:"),
+        #  checkboxGroupInput("selection", "Selected:",
+        #                   choices=unique(data()$Student.Name), selected=unique(data()$Student.Name))
+          #uiOutput("selected_students")
         )
   })
   
