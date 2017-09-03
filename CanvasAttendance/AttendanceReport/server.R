@@ -60,6 +60,12 @@ server <- function(input, output) {
     selectInput("student", "Select a student", as.list(studentnames))
   })
   
+  checkbox_choices <- c("Select All", "Select None")
+  
+  output$choose_students <- renderUI({
+    if(is.null(data())){return("")}
+    checkboxGroupInput("selected_students", "Selected:", choices=unique(data()$Student.Name), selected=unique(data()$Student.Name))
+  })
   
   output$statuses <- reactive({
     if(is.null(data())){return("")}
@@ -101,7 +107,7 @@ server <- function(input, output) {
   output$by_day <- renderTable({
     if(is.null(data())){return ()}
     data() %>%
-      filter(Class.Date == input$day, Attendance %in% input$status) %>%
+      filter(Class.Date == input$day, Student.Name %in% input$selected_students, Attendance %in% input$status) %>%
 
       #arrange(Last.Name, First.Name) %>%
       select(Student.Name, Attendance)
@@ -148,16 +154,14 @@ server <- function(input, output) {
   output$attendreport <- renderTable({
     if(is.null(data())){return ()}
     data() %>% 
-      #dplyr::mutate(Last.Name = str_extract(Student.Name, "[A-Za-z'-]+$")) %>%
-      #dplyr::mutate(First.Name = str_extract(Student.Name, "^[A-Za-z'-]+")) %>%
+      filter(Student.Name %in% input$selected_students) %>%
       group_by(Last.Name, First.Name, Student.Name) %>%
       mutate(Status.Present = ifelse(Attendance=="present",1,0)) %>%
       mutate(Status.Absent = ifelse(Attendance=="absent",1,0)) %>%
       mutate(Status.Unmarked = ifelse(Attendance=="unmarked",1,0)) %>%
       summarize(sumP = sum(Status.Present),
                 sumA = sum(Status.Absent),
-                sumU = sum(Status.Unmarked)
-      ) %>%
+                sumU = sum(Status.Unmarked)) %>%
       dplyr::mutate(Attend.Pct = 100 * sumP / (sumP + sumA)) %>%
       dplyr::mutate(Attend.Rate = paste(sumP,"/",sumP+sumA) ) %>%
       filter(Attend.Pct <= input$pct | as.integer(substr(Attend.Rate, nchar(Attend.Rate), nchar(Attend.Rate))) <= input$maxdays) %>%
