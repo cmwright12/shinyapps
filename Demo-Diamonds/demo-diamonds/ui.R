@@ -6,7 +6,7 @@ dataset <- diamonds
 
 fluidPage(
   
-  titlePanel("Diamonds Explorer"),
+  titlePanel("Diamonds Explorer Extravaganza!"),
   
   
   

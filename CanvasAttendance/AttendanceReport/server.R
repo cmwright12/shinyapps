@@ -44,11 +44,22 @@ server <- function(input, output) {
   })
   
   output$choose_day <- renderUI({
-    selectInput("day", "Choose a Date", as.list(data()$Class.Date))
+    selectInput("day", "Choose a Date", choices=data()$Class.Date, selected=data()$Class.Date[1])
   })
   
   output$choose_status <- renderUI({
-    checkboxGroupInput("status", "Show:", choices=as.list(unique(data()$Attendance)), selected=as.list(unique(data()$Attendance)) )
+    checkboxGroupInput("status", "Show:", choices=unique(data()$Attendance), selected=unique(data()$Attendance) )
+  })
+  
+  output$choose_student <- renderUI({
+    studentnames <- data() %>%
+      dplyr::mutate(Last.Name = str_extract(Student.Name, "[A-Za-z'-]+$")) %>%
+      dplyr::mutate(First.Name = str_extract(Student.Name, "^[A-Za-z'-]+")) %>%
+      #dplyr::mutate(Name = paste(Last.Name, ", ", First.Name, sep="")) %>%
+      arrange(Last.Name, First.Name) %>%
+      distinct(Student.Name)
+    #selectInput("student", "Select a student", as.list(unique(data()$Student.Name)))
+    selectInput("student", "Select a student", as.list(studentnames))
   })
   
   output$statuses <- reactive({
@@ -99,6 +110,34 @@ server <- function(input, output) {
       select(Student.Name, Attendance)
   })
   
+  # Days attended per student
+  student_report <- function(student){
+    print(paste("Name: ", student))
+    by_individual <- data() %>% 
+      filter(Student.Name == student) %>% 
+      select(Class.Date, Attendance) 
+    return(by_individual)
+  }
+  
+  output$by_student <- renderTable({
+    if(is.null(data())){return ()}
+    student_report(input$student)
+  })
+  
+  output$by_student_rate <- renderTable({
+    if(is.null(data())){return ()}
+    data() %>%
+      filter(Student.Name==input$student) %>%
+      mutate(Status.Present = ifelse(Attendance=="present",1,0)) %>%
+      mutate(Status.Absent = ifelse(Attendance=="absent",1,0)) %>%
+      mutate(Status.Unmarked = ifelse(Attendance=="unmarked",1,0)) %>%
+      summarize(sumP = sum(Status.Present),
+                sumA = sum(Status.Absent),
+                sumU = sum(Status.Unmarked)) %>%
+      mutate(Attend.Pct = 100 * sumP / (sumP + sumA)) %>%
+      mutate(Attend.Rate = paste(sumP,"/",sumP+sumA) ) %>%
+      select(Attend.Pct, Attend.Rate)
+  })
   
   # the following renderUI is used to dynamically generate the tabsets when the file is loaded. Until the file is loaded, app will not show the tabset.
   output$tb <- renderUI({
