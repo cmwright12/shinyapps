@@ -1,0 +1,12 @@
+name: canvasattendancereport
+title: CanvasAttendanceReport
+username:
+account: cmwright12
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 210299
+bundleId: 965152
+url: https://cmwright12.shinyapps.io/canvasattendancereport/
+when: 1504417192.1121
+asMultiple: FALSE
+asStatic: FALSE
