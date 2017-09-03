@@ -4,7 +4,7 @@ library(dplyr)
 library(stringr)
 
 dashboardPage(
-  dashboardHeader(title= "Canvas Attendance Report - Menu Branch"),
+  dashboardHeader(title= "Canvas Attendance Report"),
   dashboardSidebar(
     
     # Input: Select a file ----
@@ -20,8 +20,8 @@ dashboardPage(
     # Menu ----
     sidebarMenu(
       menuItem(h3("Dashboard"), tabName="dashboard"),
-      menuItem(h3("By Date"), tabName = "menu_date")
-      #menuItem(h3("By Student"), tabName = "menu_student")
+      menuItem(h3("By Date"), tabName = "menu_date"),
+      menuItem(h3("By Student"), tabName = "menu_student")
       #menuItem(h3("Attendance Report"), tabName = "menu_report")
     )
   ),
@@ -40,7 +40,13 @@ dashboardPage(
               uiOutput("choose_status"),
               textOutput(length("by_day")),
               uiOutput("by_day")
-              
+      ),
+      
+      # Third tab content
+      tabItem(tabName = "menu_student",
+              uiOutput("choose_student"),
+              uiOutput("by_student_rate"),
+              uiOutput("by_student")
       )
       
     )
