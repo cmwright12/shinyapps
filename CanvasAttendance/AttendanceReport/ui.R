@@ -1,4 +1,4 @@
-### Developer: Carmen Wright ###
+### App Developer: Carmen Wright ###
 
 library(shiny)
 library(shinydashboard)
