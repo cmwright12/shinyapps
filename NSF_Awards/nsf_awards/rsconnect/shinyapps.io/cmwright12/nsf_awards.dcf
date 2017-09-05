@@ -1,0 +1,12 @@
+name: nsf_awards
+title: nsf_awards
+username:
+account: cmwright12
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 210828
+bundleId: 967686
+url: https://cmwright12.shinyapps.io/nsf_awards/
+when: 1504590193.56668
+asMultiple: FALSE
+asStatic: FALSE

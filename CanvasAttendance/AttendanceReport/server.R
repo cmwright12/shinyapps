@@ -1,3 +1,5 @@
+### App Developer: Carmen Wright
+
 library(shiny)
 library(shinydashboard)
 library(dplyr)
@@ -155,7 +157,7 @@ server <- function(input, output) {
     if(is.null(data())){return ()}
     data() %>% 
       filter(Student.Name %in% input$selected_students) %>%
-      group_by(Last.Name, First.Name, Student.Name) %>%
+      group_by(Last.Name, First.Name) %>%
       mutate(Status.Present = ifelse(Attendance=="present",1,0)) %>%
       mutate(Status.Absent = ifelse(Attendance=="absent",1,0)) %>%
       mutate(Status.Unmarked = ifelse(Attendance=="unmarked",1,0)) %>%
@@ -165,7 +167,7 @@ server <- function(input, output) {
       dplyr::mutate(Attend.Pct = 100 * sumP / (sumP + sumA)) %>%
       dplyr::mutate(Attend.Rate = paste(sumP,"/",sumP+sumA) ) %>%
       filter(Attend.Pct <= input$pct | as.integer(substr(Attend.Rate, nchar(Attend.Rate), nchar(Attend.Rate))) <= input$maxdays) %>%
-      select(Student.Name, Attend.Pct, Attend.Rate)
+      select(Last.Name, First.Name, Attend.Pct, Attend.Rate)
       
   })
   
